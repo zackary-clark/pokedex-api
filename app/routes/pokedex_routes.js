@@ -36,7 +36,7 @@ router.get('/pokedex', requireToken, (req, res) => {
     // filter so a user cann only get their own saved pokedexes
     .then(pokedexes => pokedexes.filter(pokedex => pokedex.owner.equals(req.user._id)))
     // respond with status 200 and JSON of the pokedexes
-    .then(pokedexes => res.status(200).json({ pokedexes: pokedexes }))
+    .then(pokedexes => pokedexes.length > 0 ? res.status(200).json({ pokedexes: pokedexes }) : res.status(204).json({ pokedexes: []}))
     // if an error occurs, pass it to the handler
     .catch(err => handle(err, res))
 })
@@ -60,6 +60,8 @@ router.get('/pokedex/:id', requireToken, (req, res) => {
 router.post('/pokedex', requireToken, (req, res) => {
   // set owner of new pokedex to be current user
   req.body.pokedex.owner = req.user.id
+
+  console.log(req.body)
 
   Pokedex.create(req.body.pokedex)
     // respond to succesful `create` with status 201 and JSON of new "pokedex"
